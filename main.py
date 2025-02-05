@@ -1,7 +1,5 @@
-from tools import *
-from arbitrage import ArbitrageStrategy
-import time
+from screener import *
+from strategy.ArbitrageStrategy import *
 
-while True:
-    ArbitrageStrategy()
-    time.sleep(300)
+s = Screener("data/golds.txt", AbritrageStrategy, delay=5)
+s.execute()
