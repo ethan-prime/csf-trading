@@ -1,9 +1,7 @@
 from tools import *
+from arbitrage import ArbitrageStrategy
+import time
 
-item = "AK-47 | Bloodsport (Field-Tested)"
-sales = get_sales(item, stickers=False)
-print(sales)
-prices = get_sales_prices(sales)
-print(prices)
-print(f"Average Price: ${to_usd(avg(prices))}")
-print(get_buy_orders(805905729717406597, item))
+while True:
+    ArbitrageStrategy()
+    time.sleep(300)
