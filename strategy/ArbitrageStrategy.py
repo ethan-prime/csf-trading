@@ -1,5 +1,6 @@
 from tools import *
 from visual import *
+from stats import *
 import time
 
 FEE = 0.025
@@ -16,7 +17,7 @@ def AbritrageStrategy(items: list, threshold=30, delta=0.01, epsilon=10, delay=2
 
     if write_to_output is not None:
         with open(write_to_output, 'w', encoding='utf-8') as f:
-            f.write("Item_Name, Max_Buy_Order, Market_Value, EV, N_Sales\n")
+            f.write("Item_Name, Max_Buy_Order, Market_Value, EV, N_Sales, Volume_7_Days\n")
 
     for i, item in enumerate(items):
         print(f"{i+1}/{len(items)} [~{delay*(len(items)-i-1)}s remaining...]")
@@ -30,15 +31,17 @@ def AbritrageStrategy(items: list, threshold=30, delta=0.01, epsilon=10, delay=2
             max_buy_order = max([x['price'] for x in buy_orders])
             sales = get_sales(item)
             past_prices = get_sales_prices(sales)
+            past_prices = remove_outliers_iqr(past_prices)
 
             expected_profit = (base_price*(1-FEE)-max_buy_order-(delta*100))
             n_sales = len([x for x in past_prices if x <= max_buy_order + epsilon*100])
+            vol = volume(sales, 7)
 
-            if (expected_profit > threshold*100) and n_sales > 0 and was_recent(sales[0]['sold_at'], 3):
-                send_webhook(item, round(max_buy_order/100, 2), round(base_price/100, 2), round(expected_profit/100, 2), n_sales, url, icon_url)
+            if (expected_profit > threshold*100) and n_sales > 0 and price_accurate(base_price, past_prices, percent=0.05) and vol >= 3:
+                send_webhook(item, round(max_buy_order/100, 2), round(base_price/100, 2), round(expected_profit/100, 2), n_sales, vol, url, icon_url)
                 if write_to_output is not None:
                     with open(write_to_output, 'a', encoding='utf-8') as f:
-                        f.write(f"{item}, {max_buy_order}, {base_price}, {expected_profit}, {n_sales}\n")
+                        f.write(f"{item}, {max_buy_order}, {base_price}, {expected_profit}, {n_sales}, {vol}\n")
 
             print(f"{item} | EV: {round(expected_profit/100, 2)} | #: {n_sales}")
             time.sleep(delay)

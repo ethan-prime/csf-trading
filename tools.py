@@ -149,3 +149,15 @@ def was_recent(date_str, n_days):
     
     # Return True if the time difference is less than or equal to 24 hours, else False
     return time_difference <= timedelta(days=n_days)
+
+def volume(sales, n_days):
+    return len(list(filter(lambda x: was_recent(x['sold_at'], n_days=n_days), sales)))
+
+# returns whether we have sold >= n_sales in the past n_days
+def has_volume(sales, n_sales, n_days):
+    return volume(sales, n_days) >= n_sales
+
+# calculates whether or not the predicted price is within a percentage of the average sale price.
+def price_accurate(price, sale_prices, percent=0.03):
+    average = avg(sale_prices)
+    return abs(price-average) <= percent*price
