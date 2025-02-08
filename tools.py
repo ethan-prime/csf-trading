@@ -153,6 +153,7 @@ def was_recent(date_str, n_days):
     # Return True if the time difference is less than or equal to 24 hours, else False
     return time_difference <= timedelta(days=n_days)
 
+# how many sales were made in the past n_days
 def volume(sales, n_days):
     return len(list(filter(lambda x: was_recent(x['sold_at'], n_days=n_days), sales)))
 
