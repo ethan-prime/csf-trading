@@ -69,6 +69,9 @@ def get_buy_orders(listing_id: int, expect: str) -> list:
     buy_orders.sort(key=lambda x: x['price'], reverse=True)
     return buy_orders
 
+def get_max_buy_order(id: int, item: str):
+    return max([x['price'] for x in get_buy_orders(id, item)])
+
 def add_buy_order(max_price: int, quantity: int = 1, item_name: str = None, expression: str = None) -> None:
     payload = {}
     if expression is not None:
