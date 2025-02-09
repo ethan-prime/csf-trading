@@ -2,21 +2,23 @@ from config import *
 import requests
 from datetime import datetime, timedelta, timezone
 import time
+from tqdm import tqdm
 
 i = 0
 auth_header = {"Authorization": API_KEY_CSF}
 cookie_header = {"cookie": COOKIE}
 
 def cooldown():
-    print("We're being rate limited... switching auth keys...")
-    global i
-    i += 1
-    auth_header["Authorization"] = CYCLE_KEYS[i % len(CYCLE_KEYS)]
-    cookie_header["cookie"] = CYCLE_COOKIES[i % len(CYCLE_COOKIES)]
-    print(auth_header)
-    print(cookie_header)
-    print("Sleeping 100s...")
-    time.sleep(100)
+    ##print("We're being rate limited... switching auth keys...")
+    #global i
+    #i += 1
+    #auth_header["Authorization"] = CYCLE_KEYS[i % len(CYCLE_KEYS)]
+    #cookie_header["cookie"] = CYCLE_COOKIES[i % len(CYCLE_COOKIES)]
+    #print(auth_header)
+    #print(cookie_header)
+    print("Sleeping 300s...")
+    for i in tqdm(range(300)):
+        time.sleep(1)
 
 # SALES
 def get_sales(item_name: str, stickers: bool = False) -> list:

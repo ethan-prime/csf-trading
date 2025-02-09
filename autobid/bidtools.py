@@ -46,5 +46,4 @@ def autobid(threshold: int, delay: int = 20):
             eq = ceil(ArbitrageStrategy([name], threshold=threshold, send_alert=False))
             print(eq)
             try_update_buy_order(id, eq)
-            time.sleep(0.5)
-        time.sleep(delay)
+            time.sleep(60)
