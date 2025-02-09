@@ -1,11 +1,12 @@
 from tools import *
 from visual import *
+from strategy.ArbitrageStrategy import ArbitrageStrategy
+from math import ceil
 
 def get_buy_order_by_id(buy_order_id: int):
     orders = get_my_buy_orders()
-
     for order in orders['orders']:
-        if int(order['id']) == buy_order_id:
+        if order['id'] == buy_order_id:
             return order
 
 # if we have the highest buy order, do nothing
@@ -25,7 +26,7 @@ def try_update_buy_order(buy_order_id: int, threshold: int, delta: int=1):
     max_buy_order = get_max_buy_order(id, item)
     print(max_buy_order)
 
-    if max_buy_order >= my_price:
+    if max_buy_order > my_price:
         if max_buy_order + delta <= threshold:
             remove_buy_order(buy_order_id)
             add_buy_order(bid := max_buy_order + delta, 1, item_name=item)
@@ -36,13 +37,14 @@ def try_update_buy_order(buy_order_id: int, threshold: int, delta: int=1):
             print(msg := f"[CSF TRADER] Removed order on {item} as threshold was exceeded.")
             send_webhook_msg(msg)
 
-def autobid(bids: list, delay: int = 20):
+def autobid(threshold: int, delay: int = 20):
     while True:
         buy_orders = get_my_buy_orders()['orders']
         for buy_order in buy_orders:
-            if name := buy_order['name'] in bids:
-                id = buy_order['id']
-                threshold = bids[name]['threshold']
-                try_update_buy_order(id, threshold)
-                time.sleep(0.5)
+            id = buy_order['id']
+            name = buy_order['market_hash_name']
+            eq = ceil(ArbitrageStrategy([name], threshold=threshold, send_alert=False))
+            print(eq)
+            try_update_buy_order(id, eq)
+            time.sleep(0.5)
         time.sleep(delay)

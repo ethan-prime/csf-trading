@@ -3,16 +3,27 @@ import requests
 from datetime import datetime, timedelta, timezone
 import time
 
+i = 0
+auth_header = {"Authorization": API_KEY_CSF}
+cookie_header = {"cookie": COOKIE}
+
 def cooldown():
-    print("We're being rate limited... retrying in 300s.")
-    time.sleep(300)
+    print("We're being rate limited... switching auth keys...")
+    global i
+    i += 1
+    auth_header["Authorization"] = CYCLE_KEYS[i % len(CYCLE_KEYS)]
+    cookie_header["cookie"] = CYCLE_COOKIES[i % len(CYCLE_COOKIES)]
+    print(auth_header)
+    print(cookie_header)
+    print("Sleeping 100s...")
+    time.sleep(100)
 
 # SALES
 def get_sales(item_name: str, stickers: bool = False) -> list:
     # https://csfloat.com/api/v1/history/AWP | Dragon Lore (Factory New)/sales
     url = f'{API_URL}/history/{item_name}/sales'
 
-    r = requests.get(url, headers=AUTH_HEADERS)
+    r = requests.get(url, headers=auth_header)
     # being rate-limited...
     if r.status_code == 429:
         cooldown()
@@ -28,7 +39,7 @@ def get_sales_prices(sales):
 
 def get_base_price(listing_id):
     url = f'{API_URL}/listings/{listing_id}'
-    r = requests.get(url, headers=COOKIE_HEADERS).json()
+    r = requests.get(url, headers=cookie_header).json()
     if r.status_code == 429:
         cooldown()
         return get_base_price(listing_id)
@@ -38,7 +49,7 @@ def get_base_price(listing_id):
 
 def get_info_by_hash_name(hash_name: str):
     url = f'{API_URL}/listings?market_hash_name={hash_name}'
-    r = requests.get(url, headers=COOKIE_HEADERS)
+    r = requests.get(url, headers=cookie_header)
     if r.status_code == 429:
         cooldown()
         return get_info_by_hash_name(hash_name)
@@ -59,7 +70,7 @@ def to_usd(csf_price):
 def get_buy_orders(listing_id: int, expect: str) -> list:
     url = f'{API_URL}/listings/{listing_id}/buy-orders?limit=20'
     
-    r = requests.get(url, headers=COOKIE_HEADERS)
+    r = requests.get(url, headers=cookie_header)
     if r.status_code == 429:
         cooldown()
         return get_buy_orders(listing_id, expect)
@@ -89,7 +100,7 @@ def add_buy_order(max_price: int, quantity: int = 1, item_name: str = None, expr
     else:
         print("no item name or expression specified for buy order...")
 
-    r = requests.post(API_URL + "/buy-orders", json=payload, headers=COOKIE_HEADERS)
+    r = requests.post(API_URL + "/buy-orders", json=payload, headers=cookie_header)
     if r.status_code == 429:
         cooldown()
         return add_buy_order(max_price, quantity, item_name, expression)
@@ -101,7 +112,7 @@ def add_buy_order(max_price: int, quantity: int = 1, item_name: str = None, expr
 
 def remove_buy_order(id: int):
     url = f"{API_URL}/buy-orders/{id}"
-    r = requests.delete(url, headers=COOKIE_HEADERS)
+    r = requests.delete(url, headers=cookie_header)
     if r.status_code == 429:
         cooldown()
         return remove_buy_order(id)
@@ -113,7 +124,7 @@ def remove_buy_order(id: int):
 
 def get_my_buy_orders():
     url = f"{API_URL}/me/buy-orders?page=0&limit=100"
-    r = requests.get(url, headers=COOKIE_HEADERS)
+    r = requests.get(url, headers=cookie_header)
     if r.status_code == 429:
         cooldown()
         return get_my_buy_orders()
@@ -122,7 +133,7 @@ def get_my_buy_orders():
 # LISTINGS
 def get_listings_by_name(hash_name: str) -> list:
     url = f'{API_URL}/listings?market_hash_name={hash_name}&category=1&sort_by=most_recent' # category = 1 means normal, non-stattrak
-    r = requests.get(url, headers=COOKIE_HEADERS)
+    r = requests.get(url, headers=cookie_header)
     if r.status_code == 429:
         cooldown()
         return get_listings_by_name(hash_name)
@@ -130,7 +141,7 @@ def get_listings_by_name(hash_name: str) -> list:
 
 def get_listings_by_price(min_price: int, max_price: int) -> list:
     url = f'{API_URL}/listings?min_price={min_price*100}&max_price={max_price*100}&category=1&sort_by=most_recent'
-    r = requests.get(url, headers=COOKIE_HEADERS)
+    r = requests.get(url, headers=cookie_header)
     if r.status_code == 429:
         cooldown()
         return get_listings_by_price(min_price, max_price)
@@ -165,3 +176,10 @@ def has_volume(sales, n_sales, n_days):
 def price_accurate(price, sale_prices, percent=0.03):
     average = avg(sale_prices)
     return abs(price-average) <= percent*price
+
+# i: cycle key
+def cycle_auth(i):
+    return {"Authorization": CYCLE_KEYS[i % len(CYCLE_KEYS)]}
+
+def cycle_cookies(i):
+    return {"cookie": CYCLE_COOKIES[i % len(CYCLE_COOKIES)]}
