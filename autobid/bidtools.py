@@ -38,12 +38,17 @@ def try_update_buy_order(buy_order_id: int, threshold: int, delta: int=1):
             send_webhook_msg(msg)
 
 def autobid(threshold: int, delay: int = 20):
+    cache = {}
     while True:
         buy_orders = get_my_buy_orders()['orders']
         for buy_order in buy_orders:
             id = buy_order['id']
             name = buy_order['market_hash_name']
-            eq = ceil(ArbitrageStrategy([name], threshold=threshold, send_alert=False))
+            if name in cache:
+                eq = cache[name]
+            else:
+                eq = ceil(ArbitrageStrategy([name], threshold=threshold, send_alert=False))
+                cache[name] = eq
             print(eq)
             try_update_buy_order(id, eq)
-            time.sleep(60)
+            time.sleep(delay)
