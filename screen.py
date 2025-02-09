@@ -3,7 +3,7 @@ from autobid.bidtools import *
 from strategy.ArbitrageStrategy import *
 
 # test
-s = Screener("data/test.txt", ArbitrageStrategy, max_price=100000, threshold=20, delay=15, write_to_output="output/5.csv")
+s = Screener("data/test.txt", ArbitrageStrategy, max_price=100000, threshold=0.03, delay=15, write_to_output="output/5.csv")
 s.execute()
 
 #print(add_buy_order(500, 1, item_name="AK-47 | Aquamarine Revenge (Battle-Scarred)"))

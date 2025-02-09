@@ -6,11 +6,11 @@ import time
 
 FEE = 0.025
 
-def ArbitrageStrategy(items: list, min_price: int = 0, max_price: int = 1000000, threshold=30, delta=0.01, epsilon=10, delay=2, heuristic=harvey, write_to_output: str = None, send_alert: bool = True):
+def ArbitrageStrategy(items: list, min_price: int = 0, max_price: int = 1000000, threshold: float = 0.03, delta=0.01, epsilon=10, delay=2, heuristic=harvey, write_to_output: str = None, send_alert: bool = True):
     """
     a strategy which looks for discrepancies in buy order and market value.
     items: list of strings of items to check against strategys
-    threshold: minimum $ EV
+    threshold: minimum profit margin % (float 0 - 1)
     delta: step increase for buy order price once placed
     epsilon: we search for all sales x where buy_order <= x <= buy_order + epsilon to find if a sale is feasible
     delay: how long we wait between checking listings
@@ -40,9 +40,9 @@ def ArbitrageStrategy(items: list, min_price: int = 0, max_price: int = 1000000,
             ev_percent = expected_profit/max_buy_order
             h_val = heuristic(ev_percent, n_sales, vol)
 
-            eq = base_price*(1-FEE)-(threshold*100)
+            eq = base_price*(1-FEE)-base_price*threshold  
 
-            if (expected_profit > threshold*100) and n_sales > 0 and price_accurate(base_price, past_prices, percent=0.05) and vol >= 3 and min_price <= max_buy_order + delta <= max_price:
+            if (ev_percent >= threshold) and n_sales > 0 and price_accurate(base_price, past_prices, percent=0.05) and vol >= 3 and min_price <= max_buy_order + delta <= max_price:
                 if send_alert:
                     send_webhook(item, round(max_buy_order/100, 2), round(base_price/100, 2), round(expected_profit/100, 2), round(eq/100, 2), n_sales, vol, h_val, url, icon_url)
                 

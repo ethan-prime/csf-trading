@@ -37,7 +37,7 @@ def try_update_buy_order(buy_order_id: int, threshold: int, delta: int=1):
             print(msg := f"[CSF TRADER] Removed order on {item} as threshold was exceeded.")
             send_webhook_msg(msg)
 
-def autobid(threshold: int, delay: int = 20):
+def autobid(threshold: float, delay: int = 20):
     cache = {}
     while True:
         buy_orders = get_my_buy_orders()['orders']
