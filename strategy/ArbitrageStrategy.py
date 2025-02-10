@@ -6,7 +6,7 @@ import time
 
 FEE = 0.025
 
-def ArbitrageStrategy(items: list, min_price: int = 0, max_price: int = 1000000, threshold: float = 0.03, delta=0.01, epsilon=10, delay=2, heuristic=harvey, write_to_output: str = None, send_alert: bool = True):
+def ArbitrageStrategy(items: list, min_price: int = 0, max_price: int = 1000000, threshold: float = 0.03, delta=0.01, epsilon=10, delay=2, min_similar_sales: int = 1, min_vol: int = 3, heuristic=harvey, write_to_output: str = None, send_alert: bool = True):
     """
     a strategy which looks for discrepancies in buy order and market value.
     items: list of strings of items to check against strategys
@@ -41,8 +41,9 @@ def ArbitrageStrategy(items: list, min_price: int = 0, max_price: int = 1000000,
             h_val = heuristic(ev_percent, n_sales, vol)
 
             eq = base_price*(1-FEE)-base_price*threshold  
+            print(f"eq: {eq}")
 
-            if (ev_percent >= threshold) and n_sales > 0 and price_accurate(base_price, past_prices, percent=0.05) and vol >= 3 and min_price <= max_buy_order + delta <= max_price:
+            if (ev_percent >= threshold) and n_sales >= min_similar_sales and price_accurate(base_price, past_prices, percent=0.05) and vol >= min_vol and min_price <= max_buy_order + delta <= max_price:
                 if send_alert:
                     send_webhook(item, round(max_buy_order/100, 2), round(base_price/100, 2), round(expected_profit/100, 2), round(eq/100, 2), n_sales, vol, h_val, url, icon_url)
                 

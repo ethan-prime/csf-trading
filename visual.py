@@ -18,7 +18,7 @@ def send_webhook(item_name, buy_order, market_value, expected_profit, eq_val, n_
     embed.add_embed_field(name="EV", value=f"+${expected_profit} ({round(expected_profit/buy_order*100, 2)}%)", inline=True)
     embed.add_embed_field(name="EQ Value", value=f"${eq_val}", inline=True)
     embed.add_embed_field(name="Volume (past 7 days)", value=vol, inline=True)
-    embed.add_embed_field(name="Harvey", value=f"{h_val}", inline=True)
+    embed.add_embed_field(name="Heuristic", value=f"{h_val}", inline=True)
     embed.set_url(url)
 
     # Add embed to webhook

@@ -1,9 +1,10 @@
 from screener import *
 from autobid.bidtools import *
 from strategy.ArbitrageStrategy import *
+from heuristics.harvey import harvey, hamilton
 
 # test
-s = Screener("data/test.txt", ArbitrageStrategy, max_price=100000, threshold=0.03, delay=15, write_to_output="output/5.csv")
+s = Screener("data/500-1000kg.txt", ArbitrageStrategy, max_price=85000, threshold=0.03, min_price=20000, delay=30, min_similar_sales=3, min_vol=7, heuristic=hamilton, write_to_output="output/500-1k.csv")
 s.execute()
 
 #print(add_buy_order(500, 1, item_name="AK-47 | Aquamarine Revenge (Battle-Scarred)"))

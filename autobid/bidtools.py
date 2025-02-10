@@ -26,6 +26,12 @@ def try_update_buy_order(buy_order_id: int, threshold: int, delta: int=1):
     max_buy_order = get_max_buy_order(id, item)
     print(max_buy_order)
 
+    if my_price > threshold:
+        remove_buy_order(buy_order_id)
+        print(msg := f"[CSF TRADER] Removed order on {item} as threshold was exceeded.")
+        send_webhook_msg(msg)
+        return
+
     if max_buy_order > my_price:
         if max_buy_order + delta <= threshold:
             remove_buy_order(buy_order_id)

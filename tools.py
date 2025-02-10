@@ -16,8 +16,8 @@ def cooldown():
     #cookie_header["cookie"] = CYCLE_COOKIES[i % len(CYCLE_COOKIES)]
     #print(auth_header)
     #print(cookie_header)
-    print("Sleeping 300s...")
-    for i in tqdm(range(300)):
+    print("Sleeping 15m...")
+    for i in tqdm(range(15*60)):
         time.sleep(1)
 
 # SALES
