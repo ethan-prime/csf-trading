@@ -51,10 +51,11 @@ def autobid(threshold: float, delay: int = 20):
                     id = buy_order['id']
                     name = buy_order['market_hash_name']
                     if name in cache.data:
-                        eq = cache[name]
+                        eq = cache.get(name)
+                        print("data was cached!")
                     else:
                         eq = ceil(ArbitrageStrategy([name], threshold=threshold, send_alert=False))
-                        cache[name] = eq
+                        cache.add(name, eq)
                     print(eq)
                     try_update_buy_order(id, eq)
                     time.sleep(delay)

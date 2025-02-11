@@ -36,19 +36,19 @@ class Database:
         for row in rows:
             self.add_row(section, row)
 
-    def add(self, key, value) -> None:
-        self.data[key] = value
+    def add(self, section: str, value) -> None:
+        self.data[section] = value
         self.save()
 
-    def get(self, key):
-        if key in self.data:
-            return self.data[key]
+    def get(self, section: str):
+        if section in self.data:
+            return self.data[section]
         return None
     
     def clear_section(self, section: str) -> None:
-        self._data[section] = {}
+        self.data[section] = {}
         self.save()
 
     def clear(self) -> None:
-        self._data = {}
+        self.data = {}
         self.save()
