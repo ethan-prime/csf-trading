@@ -49,5 +49,5 @@ class Database:
         self.save()
 
     def clear(self) -> None:
-        self.data = {}
+        self._data = {}
         self.save()

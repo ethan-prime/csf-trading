@@ -13,13 +13,7 @@ with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
 i = 0
 while (i+1)*STEP < len(s.scan_list):
     skins = s.scan_list[i*STEP:(i+1)*STEP]
-    prices = scrape_skins(skins, OUTPUT_FILE)
-    with open(OUTPUT_FILE, 'a', encoding='utf-8') as f:
-        for price in prices:
-            f.write(f"{price[0]}, {price[1]}\n")
+    scrape_skins(skins, OUTPUT_FILE)
     i += 1
 
-prices = scrape_skins(s.scan_list[i*STEP:])
-with open(OUTPUT_FILE, 'a', encoding='utf-8') as f:
-    for price in prices:
-        f.write(f"{price[0]}, {price[1]}\n")
+scrape_skins(s.scan_list[i*STEP:])
