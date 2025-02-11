@@ -58,7 +58,7 @@ def autobid(threshold: float, delay: int = 20):
                         cache.add(name, eq)
                     print(eq)
                     try_update_buy_order(id, eq)
-                    time.sleep(delay)
+                    time.sleep(delay/len(buy_orders))
                 except:
                     remove_buy_order(id)
                     continue

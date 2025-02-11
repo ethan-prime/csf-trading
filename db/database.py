@@ -1,6 +1,5 @@
 import json
 import os
-from collections import UserDict
 
 class Database:
     def __init__(self, db_file: str) -> None:

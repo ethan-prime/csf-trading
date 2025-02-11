@@ -4,7 +4,7 @@ from stats import *
 from heuristics.harvey import harvey
 import time
 
-FEE = 0.025
+FEE = 0.02
 
 def ArbitrageStrategy(items: list, min_price: int = 0, max_price: int = 1000000, threshold: float = 0.03, delta=0.01, epsilon=10, delay=2, min_similar_sales: int = 1, min_vol: int = 3, heuristic=harvey, write_to_output: str = None, send_alert: bool = True):
     """
@@ -43,10 +43,12 @@ def ArbitrageStrategy(items: list, min_price: int = 0, max_price: int = 1000000,
             eq = base_price*(1-FEE)-base_price*threshold  
             print(f"eq: {eq}")
 
-            if (ev_percent >= threshold) and n_sales >= min_similar_sales and price_accurate(base_price, past_prices, percent=0.05) and vol >= min_vol and min_price <= max_buy_order + delta <= max_price:
+            if (ev_percent >= threshold) and n_sales >= min_similar_sales and price_accurate(base_price, past_prices, percent=0.03) and vol >= min_vol and min_price <= max_buy_order + delta <= max_price:
                 if send_alert:
                     send_webhook(item, round(max_buy_order/100, 2), round(base_price/100, 2), round(expected_profit/100, 2), round(eq/100, 2), n_sales, vol, h_val, url, icon_url)
-                
+                    if ev_percent >= 0.07:
+                        # autobid
+                        add_buy_order(100, 1, item)
                 if write_to_output is not None:
                     with open(write_to_output, 'a', encoding='utf-8') as f:
                         f.write(f"{item}, {max_buy_order}, {base_price}, {expected_profit}, {eq}, {n_sales}, {vol}, {h_val}\n")
