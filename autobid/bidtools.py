@@ -46,15 +46,19 @@ def try_update_buy_order(buy_order_id: int, threshold: int, delta: int=1):
 def autobid(threshold: float, delay: int = 20):
     cache = {}
     while True:
-        buy_orders = get_my_buy_orders()['orders']
-        for buy_order in buy_orders:
-            id = buy_order['id']
-            name = buy_order['market_hash_name']
-            if name in cache:
-                eq = cache[name]
-            else:
-                eq = ceil(ArbitrageStrategy([name], threshold=threshold, send_alert=False))
-                cache[name] = eq
-            print(eq)
-            try_update_buy_order(id, eq)
-            time.sleep(delay)
+            buy_orders = get_my_buy_orders()['orders']
+            for buy_order in buy_orders:
+                try:
+                    id = buy_order['id']
+                    name = buy_order['market_hash_name']
+                    if name in cache:
+                        eq = cache[name]
+                    else:
+                        eq = ceil(ArbitrageStrategy([name], threshold=threshold, send_alert=False))
+                        cache[name] = eq
+                    print(eq)
+                    try_update_buy_order(id, eq)
+                    time.sleep(delay)
+                except:
+                    remove_buy_order(id)
+                    continue
