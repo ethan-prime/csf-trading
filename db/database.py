@@ -25,3 +25,13 @@ class Database:
         if self._data is None:
             self.read_data()
         return self._data
+    
+    def add_row(self, section: str, row: dict) -> None:
+        if section not in self.data:
+            self.data[section] = []
+        self.data[section].append(row)
+        self.save()
+
+    def add_rows(self, section: str, rows: list[dict]) -> None:
+        for row in rows:
+            self.add_row(section, row)
