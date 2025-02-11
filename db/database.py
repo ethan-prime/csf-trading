@@ -35,3 +35,20 @@ class Database:
     def add_rows(self, section: str, rows: list[dict]) -> None:
         for row in rows:
             self.add_row(section, row)
+
+    def add(self, key, value) -> None:
+        self.data[key] = value
+        self.save()
+
+    def get(self, key):
+        if key in self.data:
+            return self.data[key]
+        return None
+    
+    def clear_section(self, section: str) -> None:
+        self._data[section] = {}
+        self.save()
+
+    def clear(self) -> None:
+        self._data = {}
+        self.save()

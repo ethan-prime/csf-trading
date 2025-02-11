@@ -1,12 +1,14 @@
 from config import *
 import requests
 from datetime import datetime, timedelta, timezone
+from db.database import Database
 import time
 from tqdm import tqdm
 
 i = 0
 auth_header = {"Authorization": API_KEY_CSF}
 cookie_header = {"cookie": COOKIE}
+cache = Database("db/cache")
 
 def cooldown():
     ##print("We're being rate limited... switching auth keys...")
