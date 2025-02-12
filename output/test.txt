@@ -1,0 +1,11 @@
+Item_Name, Price
+★ Butterfly Knife | Case Hardened (Factory New), 1,574.21
+★ Butterfly Knife | Case Hardened (Minimal Wear), 1,156.70
+★ Butterfly Knife | Case Hardened (Field-Tested), 1,043.11
+★ Butterfly Knife | Case Hardened (Well-Worn), 944.52
+★ Butterfly Knife | Case Hardened (Battle-Scarred), 910.30
+★ StatTrak™ Butterfly Knife | Case Hardened (Factory New), 1,711.09
+★ StatTrak™ Butterfly Knife | Case Hardened (Minimal Wear), 1,197.76
+★ StatTrak™ Butterfly Knife | Case Hardened (Field-Tested), 1,064.57
+★ StatTrak™ Butterfly Knife | Case Hardened (Well-Worn), 942.88
+★ StatTrak™ Butterfly Knife | Case Hardened (Battle-Scarred), 944.38
