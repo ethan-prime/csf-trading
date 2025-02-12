@@ -55,7 +55,7 @@ def ArbitrageStrategy(items: list, min_price: int = 0, max_price: int = 1000000,
                     with open(write_to_output, 'a', encoding='utf-8') as f:
                         f.write(f"{item}, {max_buy_order}, {base_price}, {expected_profit}, {eq}, {n_sales}, {vol}, {h_val}\n")
 
-            print(f"{item} | EV: {round(expected_profit/100, 2)} | #: {n_sales}")
+            print(f"{item} | ev: {round(expected_profit/100, 2)} | similar#: {n_sales} | vol#: {vol} | price acc? {price_accurate(base_price, past_prices, percent=0.03)}")
             time.sleep(delay)
         except Exception as e:
             print(e)
