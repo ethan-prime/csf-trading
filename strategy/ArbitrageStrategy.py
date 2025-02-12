@@ -6,7 +6,9 @@ import time
 
 FEE = 0.02
 
-def ArbitrageStrategy(items: list, min_price: int = 0, max_price: int = 1000000, threshold: float = 0.03, delta=0.01, epsilon=10, delay=2, min_similar_sales: int = 1, min_vol: int = 3, heuristic=harvey, write_to_output: str = None, send_alert: bool = True, autobid_ev_threshold: float = 0.07):
+def ArbitrageStrategy(items: list, min_price: int = 0, max_price: int = 1000000, threshold: float = 0.03, 
+                      delta=0.01, epsilon=10, delay=2, min_similar_sales: int = 1, min_vol: int = 3, heuristic=harvey, 
+                      write_to_output: str = None, send_alert: bool = True, autobid_ev_threshold: float = 0.07, sticker_price_threshold: int = 1000):
     """
     a strategy which looks for discrepancies in buy order and market value.
     items: list of strings of items to check against strategys
@@ -29,7 +31,7 @@ def ArbitrageStrategy(items: list, min_price: int = 0, max_price: int = 1000000,
             icon_url = f"https://community.cloudflare.steamstatic.com/economy/image/{icon_url}"
 
             max_buy_order = get_max_buy_order(id, item)
-            sales = get_sales(item)
+            sales = get_sales(item, sticker_price_threshold=sticker_price_threshold)
             past_prices = get_sales_prices(sales)
             past_prices = remove_outliers_iqr(past_prices)
 

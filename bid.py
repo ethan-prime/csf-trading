@@ -15,4 +15,4 @@ from strategy.ArbitrageStrategy import *
 #print(get_buy_order_by_id(808267621169498782))
 #try_update_buy_order(808274546749736666, 2000)
 
-autobid(threshold=0.05, delay=1200)
+autobid(threshold=0.045, delay=120)

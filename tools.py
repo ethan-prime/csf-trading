@@ -22,8 +22,14 @@ def cooldown():
     for i in tqdm(range(15*60)):
         time.sleep(1)
 
+def sum_stickers(stickers: list) -> int:
+    s = 0
+    for sticker in stickers:
+        s += sticker['reference']['price']
+    return s
+
 # SALES
-def get_sales(item_name: str, stickers: bool = False) -> list:
+def get_sales(item_name: str, sticker_price_threshold: int = 0) -> list:
     # https://csfloat.com/api/v1/history/AWP | Dragon Lore (Factory New)/sales
     url = f'{API_URL}/history/{item_name}/sales'
 
@@ -31,12 +37,18 @@ def get_sales(item_name: str, stickers: bool = False) -> list:
     # being rate-limited...
     if r.status_code == 429:
         cooldown()
-        return get_sales(item_name, stickers)
+        return get_sales(item_name, sticker_price_threshold)
 
     sales = r.json()
-    if not stickers:
-        sales = [x for x in sales if 'stickers' not in x['item']]
-    return sales
+    sales_refined = []
+    for sale in sales:
+        if "stickers" not in sale:
+            sales_refined.append(sale)
+        else:
+            if sum_stickers(sale['stickers']) <= sticker_price_threshold:
+                sales_refined.append(sale)
+
+    return sales_refined
 
 def get_sales_prices(sales):
     return [x['price'] for x in sales]
@@ -179,11 +191,14 @@ def has_volume(sales, n_sales, n_days):
 # calculates whether or not the predicted price is within a percentage of the average sale price.
 def price_accurate(price, sale_prices, percent=0.03):
     average = avg(sale_prices)
-    return abs(price-average) <= percent*price
+    if average - price >= 0:
+        return True
+    return (price-average) <= percent*price
 
-# i: cycle key
-def cycle_auth(i):
-    return {"Authorization": CYCLE_KEYS[i % len(CYCLE_KEYS)]}
-
-def cycle_cookies(i):
-    return {"cookie": CYCLE_COOKIES[i % len(CYCLE_COOKIES)]}
+def parse_args(s: str) -> dict:
+    args = s.split(" ")
+    parsed = {}
+    for arg in args:
+        a = arg.split("=")
+        parsed[a[0]] = a[1]
+    return parsed

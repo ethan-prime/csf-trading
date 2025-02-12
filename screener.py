@@ -12,10 +12,10 @@ class Screener:
             self.scan_list = f.readlines()
             self.scan_list = list(map(lambda x: x.replace('\n',''), self.scan_list))
 
-    def execute(self, n_iters: int = 1, delay: int = 0):
+    def execute(self, n_iters: int = 1, delay: int = 0, start_at: int = 0):
         self.read_list()
         
         for _ in range(n_iters):
             print("Starting ArbitrageStrategy...")
-            self.strategy(self.scan_list, **self.strategy_kwargs)
+            self.strategy(self.scan_list[start_at:], **self.strategy_kwargs)
             time.sleep(delay)
