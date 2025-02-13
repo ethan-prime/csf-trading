@@ -30,29 +30,27 @@ def try_update_buy_order(buy_order_id: int, threshold: int, delta: int=1):
         return
     my_price = buy_order['price']
     item = buy_order['market_hash_name']
-    _, _, id, _ = get_info_by_hash_name(item)
+    base_price, predicted_price, id, icon_url = get_info_by_hash_name(item)
     max_buy_order = get_max_buy_order(id, item)
     print(max_buy_order)
 
+    print(my_price, threshold)
+
     if my_price > threshold:
-        remove_buy_order(buy_order_id)
-        print(msg := f"[CSF TRADER] Removed order on {item} as threshold was exceeded.")
+        remove_buy_order(buy_order_id, item)
+        print(msg := f"Removed order on {item} as threshold was exceeded.")
         send_webhook_msg(msg)
         return
 
     if max_buy_order > my_price:
         if max_buy_order + delta <= threshold:
-            remove_buy_order(buy_order_id)
+            remove_buy_order(buy_order_id, item)
             add_buy_order(bid := max_buy_order + delta, 1, item_name=item)
-            print(msg := f"[CSF TRADER] Updated order on {item} from ${round(my_price/100, 2)} to ${round(bid/100, 2)}.")
-            cur_row = bids.get(item)
-            cur_row[item]["bid_price"] = max_buy_order + delta
-            cur_row[item]["last_updated"] = get_time_str()
-            bids.add(item, cur_row)
+            print(msg := f"Updated order on {item} from ${round(my_price/100, 2)} to ${round(bid/100, 2)}.")
             send_webhook_msg(msg)
         else:
-            remove_buy_order(buy_order_id)
-            print(msg := f"[CSF TRADER] Removed order on {item} as threshold was exceeded.")
+            remove_buy_order(buy_order_id, item)
+            print(msg := f"Removed order on {item} as threshold was exceeded.")
             send_webhook_msg(msg)
 
 def autobid(threshold: float, delay: int = 20):
@@ -62,17 +60,15 @@ def autobid(threshold: float, delay: int = 20):
                 try:
                     id = buy_order['id']
                     name = buy_order['market_hash_name']
-                    if name in bids.data:
-                        bid_data = bids.get(name)
-                        eq = bid_data["eq"]
+                    if name in cache.data:
+                        eq = cache.get(name)
                         print("bid data was cached")
                     else:
                         item, base_price, eq, icon_url = ArbitrageStrategy([name], threshold=threshold, send_alert=False)
-                        bids.add(name, {"item": item, "market_value": base_price, "bid_price": 0, "eq": eq, "image_url": icon_url, "last_updated": get_time_str()})
+                        cache.add(name, eq)
                     print(eq)
                     try_update_buy_order(id, eq)
                     time.sleep(delay)
                 except Exception as e:
-                    #remove_buy_order(id)
                     print(e)
                     continue

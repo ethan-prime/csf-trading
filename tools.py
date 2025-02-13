@@ -8,6 +8,7 @@ from tqdm import tqdm
 auth_header = {"Authorization": API_KEY_CSF}
 cookie_header = {"cookie": COOKIE}
 bids = Database("db/bids")
+cache = Database("db/cache")
 
 def cooldown():
     ##print("We're being rate limited... switching auth keys...")
@@ -122,20 +123,22 @@ def add_buy_order(max_price: int, quantity: int = 1, item_name: str = None, expr
             return add_buy_order(max_price, quantity, item_name, expression)
         if r.status_code == 200:
             print(f"Submitted buy order: {payload}")
+            bids.add(item_name, {"item": item_name, "bid_price": max_price})
         else:
             print("Error submitting buy order...")
             print(r.text)
     else:
         print(f"Buy order unsuccessful: already bidding on {item_name}.")
 
-def remove_buy_order(id: int):
+def remove_buy_order(id: int, item_name: str):
     url = f"{API_URL}/buy-orders/{id}"
     r = requests.delete(url, headers=cookie_header)
     if r.status_code == 429:
         cooldown()
-        return remove_buy_order(id)
+        return remove_buy_order(id, item_name)
     if r.status_code == 200:
         print(f"Successfully removed buy order {id}")
+        bids.clear_section(item_name)
     else:
         print("Error removing buy order")
         print(r.text)
