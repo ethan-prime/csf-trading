@@ -5,10 +5,8 @@ from db.database import Database
 import time
 from tqdm import tqdm
 
-i = 0
 auth_header = {"Authorization": API_KEY_CSF}
 cookie_header = {"cookie": COOKIE}
-cache = Database("db/cache")
 
 def cooldown():
     ##print("We're being rate limited... switching auth keys...")
@@ -189,10 +187,12 @@ def has_volume(sales, n_sales, n_days):
     return volume(sales, n_days) >= n_sales
 
 # calculates whether or not the predicted price is within a percentage of the average sale price.
-def price_accurate(price, sale_prices, percent=0.03):
+def price_accurate(price, sale_prices, percent=0.03, verbose=False):
     average = avg(sale_prices)
     if average - price >= 0:
         return True
+    if verbose:
+        print(f"avg: {average} | csf price: {price} | eq: {percent*price}")
     return (price-average) <= percent*price
 
 def parse_args(s: str) -> dict:

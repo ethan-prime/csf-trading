@@ -45,7 +45,7 @@ def ArbitrageStrategy(items: list, min_price: int = 0, max_price: int = 1000000,
             eq = base_price*(1-FEE)-base_price*threshold  
             print(f"eq: {eq}")
 
-            if (ev_percent >= threshold) and n_sales >= min_similar_sales and price_accurate(base_price, past_prices, percent=0.03) and vol >= min_vol and min_price <= max_buy_order + delta <= max_price:
+            if (ev_percent >= threshold) and n_sales >= min_similar_sales and price_accurate(base_price, past_prices, percent=0.04, verbose=True) and vol >= min_vol and min_price <= max_buy_order + delta <= max_price:
                 if send_alert:
                     send_webhook(item, round(max_buy_order/100, 2), round(base_price/100, 2), round(expected_profit/100, 2), round(eq/100, 2), n_sales, vol, h_val, url, icon_url)
                     if ev_percent >= autobid_ev_threshold:
@@ -54,8 +54,7 @@ def ArbitrageStrategy(items: list, min_price: int = 0, max_price: int = 1000000,
                 if write_to_output is not None:
                     with open(write_to_output, 'a', encoding='utf-8') as f:
                         f.write(f"{item}, {max_buy_order}, {base_price}, {expected_profit}, {eq}, {n_sales}, {vol}, {h_val}\n")
-
-            print(f"{item} | ev: {round(expected_profit/100, 2)} | similar#: {n_sales} | vol#: {vol} | price acc? {price_accurate(base_price, past_prices, percent=0.03)}")
+            print(f"{item} | ev: {round(expected_profit/100, 2)} | similar#: {n_sales} | vol#: {vol} | price acc? {price_accurate(base_price, past_prices, percent=0.04)}")
             time.sleep(delay)
         except Exception as e:
             print(e)
@@ -63,4 +62,4 @@ def ArbitrageStrategy(items: list, min_price: int = 0, max_price: int = 1000000,
             continue
 
     if len(items) == 1:
-        return eq
+        return item, base_price, eq, icon_url

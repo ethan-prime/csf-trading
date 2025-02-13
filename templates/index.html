@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS2 Trading Dashboard</title>
+    <style>
+        /* General styles */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: lightslategrey;
+        }
+
+        /* Title */
+        .title {
+            text-align: center;
+            padding: 10px;
+        }
+
+        /* Flex container */
+        .container {
+            display: flex;
+            height: 90vh;
+        }
+
+        /* Left side (bids list) */
+        .lefthalf {
+            width: 50%;
+            padding: 20px;
+            overflow-y: auto; /* Enables scrolling */
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        #bids-list {
+            width: 100%;
+            max-height: 100%;
+            overflow-y: scroll; /* Allow scrolling */
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        /* For Chrome, Safari, and Edge */
+        #bids-list::-webkit-scrollbar {
+            width: 0px;  /* Hide the scrollbar */
+            background: transparent; /* Ensure no background */
+        }
+
+        /* For Firefox */
+        #bids-list {
+            scrollbar-width: none; /* Hide the scrollbar */
+        }
+
+        .bid {
+            padding: 8px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Distribute space evenly between items */
+            width: 96.5%;
+        }
+
+        .bid img {
+            height: 160px;
+            margin-right: 10px;
+            margin-left: 10px;
+            border-radius: 5px;
+        }
+
+        .bid .item-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            flex-grow: 1; /* Allow item name to take up available space */
+        }
+
+        .bid .timestamp {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        /* Right side (image display) */
+        .righthalf {
+            width: 50%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #bid-image {
+            max-width: 90%;
+            max-height: 70vh;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">CS2 Trading Dashboard</h1>
+    <div class="container">
+        <div class="lefthalf">
+            <div id="bids-list"></div> <!-- Ensure this div has the correct ID -->
+        </div>
+        <div class="righthalf">
+            
+        </div>
+    </div>
+
+    <script>
+        // Set up the URL to fetch the bids JSON data
+        const bidsUrl = "/bids";
+
+        function roundToDecimals(num, decimals) {
+            const factor = Math.pow(10, decimals);
+            return Math.round(num * factor) / factor;
+        }
+
+        // Function to fetch and display the data
+        function fetchAndDisplayBids() {
+            // Fetch the JSON data from the server
+            fetch(bidsUrl)
+                .then(response => response.json()) // Parse the response as JSON
+                .then(data => {
+                    console.log(data)
+                    // Get all the keys (item names) in the data
+                    const itemNames = Object.keys(data);
+
+                    // Clear the current display before appending new items
+                    const bidsContainer = document.getElementById('bids-list'); // Fixed here
+                    bidsContainer.innerHTML = "";
+
+                    // Loop through the items and display them
+                    itemNames.forEach(item => {
+                        const bidData = data[item];
+
+                        // Create the HTML elements to display the item details
+                        const itemElement = document.createElement('div');
+                        itemElement.classList.add('bid'); // Fixed here
+
+                        const itemImage = document.createElement('img');
+                        itemImage.src = bidData.image_url;
+                        itemImage.alt = bidData.item;
+
+                        const itemInfo = document.createElement('div');
+                        itemInfo.classList.add('item-info');
+
+                        const itemName = document.createElement('h3');
+                        itemName.innerText = bidData.item;
+
+                        const itemDetails = document.createElement('p');
+                        itemDetails.innerHTML = `
+                            <strong>Bid Price:</strong> $${roundToDecimals(bidData.bid_price/100, 2)}<br>
+                            <strong>Market Value:</strong> $${roundToDecimals(bidData.market_value/100, 2)}<br>
+                            <strong>EQ:</strong> $${roundToDecimals(bidData.eq/100, 2)}
+                        `;
+                        
+                        // Append item name and details to the itemInfo div
+                        itemInfo.appendChild(itemName);
+                        itemInfo.appendChild(itemDetails);
+
+                        // Create and display the timestamp on the far right
+                        const timestamp = document.createElement('div');
+                        timestamp.classList.add('timestamp');
+                        timestamp.innerText = `Last Updated: ${bidData.last_updated}`;
+
+                        // Append all the elements to the item container
+                        itemElement.appendChild(itemImage);
+                        itemElement.appendChild(itemInfo);
+                        itemElement.appendChild(timestamp);
+
+                        // Append the item to the DOM (for example, a container div)
+                        bidsContainer.appendChild(itemElement);
+                    });
+                })
+                .catch(error => console.error("Error fetching bids:", error));
+        }
+
+        // Set interval to refresh the bids every 5 seconds (or any time you like)
+        setInterval(fetchAndDisplayBids, 5000);
+
+        // Call the function once to display the bids immediately
+        fetchAndDisplayBids();
+    </script>
+</body>
+</html>

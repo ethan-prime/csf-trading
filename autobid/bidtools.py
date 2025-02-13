@@ -2,6 +2,14 @@ from tools import *
 from visual import *
 from strategy.ArbitrageStrategy import ArbitrageStrategy
 from math import ceil
+from db.database import Database
+from datetime import datetime
+
+bids = Database("db/bids")
+
+def get_time_str() -> str:
+    now = datetime.now()
+    return now.strftime("%m/%d %I:%M %p")
 
 def get_buy_order_by_id(buy_order_id: int):
     orders = get_my_buy_orders()
@@ -37,6 +45,10 @@ def try_update_buy_order(buy_order_id: int, threshold: int, delta: int=1):
             remove_buy_order(buy_order_id)
             add_buy_order(bid := max_buy_order + delta, 1, item_name=item)
             print(msg := f"[CSF TRADER] Updated order on {item} from ${round(my_price/100, 2)} to ${round(bid/100, 2)}.")
+            cur_row = bids.get(item)
+            cur_row[item]["bid_price"] = max_buy_order + delta
+            cur_row[item]["last_updated"] = get_time_str()
+            bids.add(item, cur_row)
             send_webhook_msg(msg)
         else:
             remove_buy_order(buy_order_id)
@@ -50,15 +62,17 @@ def autobid(threshold: float, delay: int = 20):
                 try:
                     id = buy_order['id']
                     name = buy_order['market_hash_name']
-                    if name in cache.data:
-                        eq = cache.get(name)
-                        print("data was cached!")
+                    if name in bids.data:
+                        bid_data = bids.get(name)
+                        eq = bid_data["eq"]
+                        print("bid data was cached")
                     else:
-                        eq = ceil(ArbitrageStrategy([name], threshold=threshold, send_alert=False))
-                        cache.add(name, eq)
+                        item, base_price, eq, icon_url = ArbitrageStrategy([name], threshold=threshold, send_alert=False)
+                        bids.add(name, {"item": item, "market_value": base_price, "bid_price": 0, "eq": eq, "image_url": icon_url, "last_updated": get_time_str()})
                     print(eq)
                     try_update_buy_order(id, eq)
                     time.sleep(delay)
-                except:
-                    remove_buy_order(id)
+                except Exception as e:
+                    #remove_buy_order(id)
+                    print(e)
                     continue
