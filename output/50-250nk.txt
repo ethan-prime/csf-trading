@@ -1,1 +1,0 @@
-Item_Name, Max_Buy_Order, Market_Value, EV, Eq_Value, N_Sales, Volume_7_Days, Heuristic

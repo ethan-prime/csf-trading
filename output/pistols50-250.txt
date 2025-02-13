@@ -1,7 +1,0 @@
-Item_Name, Max_Buy_Order, Market_Value, EV, Eq_Value, N_Sales, Volume_7_Days, Heuristic
-Glock-18 | Gold Toof (Factory New), 6965, 7538, 421.2399999999998, 7010.34, 13, 18, 0.6285965541995691
-Desert Eagle | Starcade (Field-Tested), 7480, 8140, 496.1999999999998, 7570.2, 14, 16, 0.6775267379679143
-Glock-18 | Dragon Tattoo (Factory New), 8826, 9673, 652.539999999999, 8995.89, 8, 11, 0.6620037389530923
-Desert Eagle | Starcade (Minimal Wear), 10372, 11482, 879.3600000000006, 10678.26, 8, 15, 0.7533657925183189
-Desert Eagle | Crimson Web (Factory New), 10506, 11459, 722.8199999999997, 10656.869999999999, 7, 13, 0.6185051399200456
-StatTrak™ Desert Eagle | Cobalt Disruption (Factory New), 13275, 14562, 994.7600000000002, 13542.66, 3, 8, 0.6120112994350284
