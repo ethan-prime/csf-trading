@@ -7,6 +7,7 @@ from tqdm import tqdm
 
 auth_header = {"Authorization": API_KEY_CSF}
 cookie_header = {"cookie": COOKIE}
+bids = Database("db/bids")
 
 def cooldown():
     ##print("We're being rate limited... switching auth keys...")
@@ -99,30 +100,33 @@ def get_max_buy_order(id: int, item: str):
 
 def add_buy_order(max_price: int, quantity: int = 1, item_name: str = None, expression: str = None) -> None:
     payload = {}
-    if expression is not None:
-        payload = {
-            "expression": expression,
-            "max_price": max_price,
-            "quantity": quantity,
-        }
-    elif item_name is not None:
-        payload = {
-            "market_hash_name": item_name,
-            "max_price": max_price,
-            "quantity": quantity,
-        }
-    else:
-        print("no item name or expression specified for buy order...")
+    if item_name not in bids.data:
+        if expression is not None:
+            payload = {
+                "expression": expression,
+                "max_price": max_price,
+                "quantity": quantity,
+            }
+        elif item_name is not None:
+            payload = {
+                "market_hash_name": item_name,
+                "max_price": max_price,
+                "quantity": quantity,
+            }
+        else:
+            print("no item name or expression specified for buy order...")
 
-    r = requests.post(API_URL + "/buy-orders", json=payload, headers=cookie_header)
-    if r.status_code == 429:
-        cooldown()
-        return add_buy_order(max_price, quantity, item_name, expression)
-    if r.status_code == 200:
-        print(f"Submitted buy order: {payload}")
+        r = requests.post(API_URL + "/buy-orders", json=payload, headers=cookie_header)
+        if r.status_code == 429:
+            cooldown()
+            return add_buy_order(max_price, quantity, item_name, expression)
+        if r.status_code == 200:
+            print(f"Submitted buy order: {payload}")
+        else:
+            print("Error submitting buy order...")
+            print(r.text)
     else:
-        print("Error submitting buy order...")
-        print(r.text)
+        print(f"Buy order unsuccessful: already bidding on {item_name}.")
 
 def remove_buy_order(id: int):
     url = f"{API_URL}/buy-orders/{id}"

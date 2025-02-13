@@ -1,3 +1,5 @@
 config.py
-data/skins.json
+data/*
+output/*
 db/bids
+test.py
