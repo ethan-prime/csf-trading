@@ -46,7 +46,7 @@ class Database:
     
     def clear_section(self, section: str) -> None:
         if section in self.data:
-            self.data[section].pop()
+            self._data.pop(section)
         self.save()
 
     def clear(self) -> None:
