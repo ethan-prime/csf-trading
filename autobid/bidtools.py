@@ -32,15 +32,14 @@ def try_update_buy_order(buy_order_id: int, threshold: int, delta: int=1):
     item = buy_order['market_hash_name']
     base_price, predicted_price, id, icon_url = get_info_by_hash_name(item)
     max_buy_order = get_max_buy_order(id, item)
-    print(max_buy_order)
-
-    print(my_price, threshold)
 
     if my_price > threshold:
         remove_buy_order(buy_order_id, item)
         print(msg := f"Removed order on {item} as threshold was exceeded.")
         send_webhook_msg(msg)
         return
+
+    print(f"my price: {my_price} | max buy order: {max_buy_order}")
 
     if max_buy_order > my_price:
         if max_buy_order + delta <= threshold:

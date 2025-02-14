@@ -9,6 +9,7 @@ auth_header = {"Authorization": API_KEY_CSF}
 cookie_header = {"cookie": COOKIE}
 bids = Database("db/bids")
 cache = Database("db/cache")
+proxies = None
 
 def cooldown():
     ##print("We're being rate limited... switching auth keys...")
@@ -33,7 +34,7 @@ def get_sales(item_name: str, sticker_price_threshold: int = 0) -> list:
     # https://csfloat.com/api/v1/history/AWP | Dragon Lore (Factory New)/sales
     url = f'{API_URL}/history/{item_name}/sales'
 
-    r = requests.get(url, headers=auth_header)
+    r = requests.get(url, headers=auth_header, proxies=proxies)
     # being rate-limited...
     if r.status_code == 429:
         cooldown()
@@ -55,7 +56,7 @@ def get_sales_prices(sales):
 
 def get_base_price(listing_id):
     url = f'{API_URL}/listings/{listing_id}'
-    r = requests.get(url, headers=cookie_header).json()
+    r = requests.get(url, headers=cookie_header, proxies=proxies).json()
     if r.status_code == 429:
         cooldown()
         return get_base_price(listing_id)
@@ -65,7 +66,7 @@ def get_base_price(listing_id):
 
 def get_info_by_hash_name(hash_name: str):
     url = f'{API_URL}/listings?market_hash_name={hash_name}'
-    r = requests.get(url, headers=cookie_header)
+    r = requests.get(url, headers=cookie_header, proxies=proxies)
     if r.status_code == 429:
         cooldown()
         return get_info_by_hash_name(hash_name)
@@ -86,7 +87,7 @@ def to_usd(csf_price):
 def get_buy_orders(listing_id: int, expect: str) -> list:
     url = f'{API_URL}/listings/{listing_id}/buy-orders?limit=20'
     
-    r = requests.get(url, headers=cookie_header)
+    r = requests.get(url, headers=cookie_header, proxies=proxies)
     if r.status_code == 429:
         cooldown()
         return get_buy_orders(listing_id, expect)
@@ -154,7 +155,7 @@ def get_my_buy_orders():
 # LISTINGS
 def get_listings_by_name(hash_name: str) -> list:
     url = f'{API_URL}/listings?market_hash_name={hash_name}&category=1&sort_by=most_recent' # category = 1 means normal, non-stattrak
-    r = requests.get(url, headers=cookie_header)
+    r = requests.get(url, headers=cookie_header, proxies=proxies)
     if r.status_code == 429:
         cooldown()
         return get_listings_by_name(hash_name)
@@ -162,7 +163,7 @@ def get_listings_by_name(hash_name: str) -> list:
 
 def get_listings_by_price(min_price: int, max_price: int) -> list:
     url = f'{API_URL}/listings?min_price={min_price*100}&max_price={max_price*100}&category=1&sort_by=most_recent'
-    r = requests.get(url, headers=cookie_header)
+    r = requests.get(url, headers=cookie_header, proxies=proxies)
     if r.status_code == 429:
         cooldown()
         return get_listings_by_price(min_price, max_price)
