@@ -29,6 +29,7 @@ Create `config.py` (or copy from `config.example.py`):
 API_URL = "https://csfloat.com/api/v1"
 API_KEY_CSF = "YOUR_CSFLOAT_API_KEY"
 COOKIE = ""  # optional ("session=..." or raw session value)
+DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/..."
 
 REQUEST_TIMEOUT_SECONDS = 20
 MIN_REQUEST_INTERVAL_SECONDS = 0.35

@@ -1,9 +1,33 @@
-# just for webhooks lol
-from discord_webhook import DiscordWebhook, DiscordEmbed
+from __future__ import annotations
 
-webhook_url = "https://discord.com/api/webhooks/1335879766540161044/8rw07Yypq9h_vEgcZtVWU9ylsxor9Vk3Dlyke8wrEK5zyFSpp4-urmIQq1LhwgZuPl9m"
+import os
+
+import config as cfg
+
+# just for webhooks lol
+
+
+def _import_webhook_client():
+    try:
+        from discord_webhook import DiscordWebhook, DiscordEmbed
+    except ModuleNotFoundError as exc:
+        raise ModuleNotFoundError(
+            "discord_webhook is required for webhook alerts. Install it with: pip install discord-webhook"
+        ) from exc
+    return DiscordWebhook, DiscordEmbed
+
+webhook_url = os.getenv("DISCORD_WEBHOOK_URL", getattr(cfg, "DISCORD_WEBHOOK_URL", "")).strip()
+
+
+def _has_webhook() -> bool:
+    return webhook_url.startswith("https://discord.com/api/webhooks/")
 
 def send_webhook(item_name, buy_order, market_value, expected_profit, eq_val, n_sales, vol, h_val, url, image_link):
+    if not _has_webhook():
+        print("Discord webhook is not configured; skipping alert.")
+        return None
+
+    DiscordWebhook, DiscordEmbed = _import_webhook_client()
     # Create webhook
     webhook = DiscordWebhook(url=webhook_url)
 
@@ -29,6 +53,11 @@ def send_webhook(item_name, buy_order, market_value, expected_profit, eq_val, n_
     return response
 
 def send_webhook_msg(msg):
+    if not _has_webhook():
+        print("Discord webhook is not configured; skipping message alert.")
+        return None
+
+    DiscordWebhook, DiscordEmbed = _import_webhook_client()
     webhook = DiscordWebhook(url=webhook_url)
     embed = DiscordEmbed(title="Bid Update", description=msg, color="3266a8")
     embed.set_author(name="CSFloat Trader", icon_url="https://csfloat.com/assets/n-mini-logo.png")

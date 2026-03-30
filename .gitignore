@@ -3,3 +3,5 @@ data/*
 output/*
 db/bids
 test.py
+__pycache__/
+*.py[cod]
