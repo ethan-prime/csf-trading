@@ -1,18 +1,33 @@
-from screener import *
-from autobid.bidtools import *
-from strategy.ArbitrageStrategy import *
+from __future__ import annotations
 
-# test
-#s = Screener("data/test.txt", ArbitrageStrategy, max_price=100000, threshold=20, delay=5, write_to_output="output/4.csv")
-#s.execute()
+import argparse
 
-#print(add_buy_order(500, 1, item_name="AK-47 | Aquamarine Revenge (Battle-Scarred)"))
+from autobid.bidtools import autobid
 
-#remove_buy_order(807403228542140855)
-#print(get_my_buy_orders())
-#808267621169498782
 
-#print(get_buy_order_by_id(808267621169498782))
-#try_update_buy_order(808274546749736666, 2000)
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Run autobid manager.")
+    parser.add_argument("--threshold", type=float, default=0.045, help="Bid threshold ratio.")
+    parser.add_argument("--delay", type=int, default=120, help="Delay (seconds) between per-order actions.")
+    parser.add_argument(
+        "--max-cycles",
+        type=int,
+        default=None,
+        help="How many outer loops to run. Omit for infinite.",
+    )
+    parser.add_argument("--dry-run", action="store_true", help="Do not place/cancel any orders.")
+    return parser
 
-autobid(threshold=0.045, delay=120)
+
+def main() -> None:
+    args = build_parser().parse_args()
+    autobid(
+        threshold=args.threshold,
+        delay=args.delay,
+        max_cycles=args.max_cycles,
+        dry_run=args.dry_run,
+    )
+
+
+if __name__ == "__main__":
+    main()
